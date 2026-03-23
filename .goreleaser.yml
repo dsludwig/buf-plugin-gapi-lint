@@ -1,0 +1,22 @@
+version: 2
+
+builds:
+  - binary: buf-plugin-gapi-lint
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+
+archives:
+  - formats:
+      - tar.gz
+    format_overrides:
+      - goos: windows
+        formats:
+          - zip
+
+changelog:
+  sort: asc

@@ -1,0 +1,63 @@
+name: Update api-linter
+
+on:
+  schedule:
+    - cron: "0 9 * * 1" # Monday 9am UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  check-update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Get current version
+        id: current
+        run: |
+          version=$(grep 'github.com/googleapis/api-linter/v2' go.mod | awk '{print $2}')
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Get latest release
+        id: latest
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          tag=$(gh api repos/googleapis/api-linter/releases/latest --jq .tag_name)
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+
+      - name: Update dependency
+        if: steps.current.outputs.version != steps.latest.outputs.tag
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          LATEST_TAG="${{ steps.latest.outputs.tag }}"
+          LINTER_VERSION="${LATEST_TAG#v}"
+          PLUGIN_VERSION=$(cat VERSION | tr -d '[:space:]')
+          RELEASE_TAG="v${PLUGIN_VERSION}-${LINTER_VERSION}"
+          BRANCH="update-api-linter-${LINTER_VERSION}"
+
+          go get "github.com/googleapis/api-linter/v2@${LATEST_TAG}"
+          go mod tidy
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$BRANCH"
+          git add go.mod go.sum
+          git commit -m "Update api-linter to ${LATEST_TAG}"
+          git push -u origin "$BRANCH"
+
+          gh pr create \
+            --title "Update api-linter to ${LATEST_TAG}" \
+            --body "Updates \`github.com/googleapis/api-linter/v2\` from \`${{ steps.current.outputs.version }}\` to \`${LATEST_TAG}\`.
+
+          Merging this PR will automatically create tag \`${RELEASE_TAG}\` and trigger a release build." \
+            --label "api-linter-update" \
+            --head "$BRANCH"
