@@ -1,0 +1,32 @@
+name: Auto-tag release
+
+on:
+  pull_request:
+    types: [closed]
+
+permissions:
+  contents: write
+
+jobs:
+  tag:
+    if: github.event.pull_request.merged == true && contains(github.event.pull_request.labels.*.name, 'api-linter-update')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Compute release tag
+        id: tag
+        run: |
+          PLUGIN_VERSION=$(cat VERSION | tr -d '[:space:]')
+          LINTER_VERSION=$(grep 'github.com/googleapis/api-linter/v2' go.mod | awk '{print $2}' | sed 's/^v//')
+          TAG="v${PLUGIN_VERSION}-${LINTER_VERSION}"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+
+      - name: Create and push tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag "${{ steps.tag.outputs.tag }}"
+          git push origin "${{ steps.tag.outputs.tag }}"
