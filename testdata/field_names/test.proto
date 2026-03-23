@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package test.v1;
+
+// BadMessage has a camelCase field name instead of lower_snake_case.
+// Should trigger core::0140::lower-snake.
+message BadMessage {
+  string badName = 1;
+}

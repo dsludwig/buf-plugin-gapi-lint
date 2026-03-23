@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package test.v1;
+
+// State enum intentionally missing STATE_UNSPECIFIED as first value.
+// Should trigger core::0126::unspecified.
+enum State {
+  ACTIVE = 0;
+  INACTIVE = 1;
+}
