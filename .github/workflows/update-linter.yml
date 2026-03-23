@@ -47,10 +47,21 @@ jobs:
           go get "github.com/googleapis/api-linter/v2@${LATEST_TAG}"
           go mod tidy
 
+          # Add changelog entry: insert new version section after "## Unreleased"
+          awk -v tag="$RELEASE_TAG" -v linter="$LATEST_TAG" '
+            /^## Unreleased$/ {
+              print; print ""
+              print "## " tag; print ""
+              print "- Update api-linter to " linter
+              next
+            }
+            { print }
+          ' CHANGELOG.md > CHANGELOG.md.tmp && mv CHANGELOG.md.tmp CHANGELOG.md
+
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git checkout -b "$BRANCH"
-          git add go.mod go.sum
+          git add go.mod go.sum CHANGELOG.md
           git commit -m "Update api-linter to ${LATEST_TAG}"
           git push -u origin "$BRANCH"
 
