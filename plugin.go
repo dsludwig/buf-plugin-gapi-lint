@@ -101,6 +101,9 @@ func buildSpec() *check.Spec {
 		Before: func(ctx context.Context, request check.Request) (context.Context, check.Request, error) {
 			protoFiles := make([]protoreflect.FileDescriptor, 0, len(request.FileDescriptors()))
 			for _, fd := range request.FileDescriptors() {
+				if fd.IsImport() {
+					continue
+				}
 				protoFiles = append(protoFiles, fd.ProtoreflectFileDescriptor())
 			}
 
