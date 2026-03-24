@@ -4,7 +4,7 @@ go 1.25.0
 
 require (
 	buf.build/go/bufplugin v0.9.0
-	github.com/googleapis/api-linter/v2 v2.3.0
+	github.com/googleapis/api-linter/v2 v2.3.1
 	google.golang.org/protobuf v1.36.11
 )
 
