@@ -91,4 +91,4 @@ Releases follow the format `v{plugin}-{linter}`, e.g., `v1.0-2.3.1`:
 
 ## License
 
-See [LICENSE](LICENSE) for details.
+See [COPYING](COPYING) for details.
