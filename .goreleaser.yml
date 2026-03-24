@@ -2,6 +2,8 @@ version: 2
 
 builds:
   - binary: buf-plugin-gapi-lint
+    ldflags:
+      - -s -w -X main.version={{ .Tag }}
     goos:
       - linux
       - darwin
