@@ -12,9 +12,9 @@ func TestRuleNameToBufPluginID(t *testing.T) {
 		input lint.RuleName
 		want  string
 	}{
-		{"core::0203::field-behavior-required", "CORE_0203_FIELD_BEHAVIOR_REQUIRED"},
-		{"core::0122::name-suffix", "CORE_0122_NAME_SUFFIX"},
-		{"cloud::0203::field-behavior-required", "CLOUD_0203_FIELD_BEHAVIOR_REQUIRED"},
+		{"core::0203::field-behavior-required", "AIP_0203_FIELD_BEHAVIOR_REQUIRED"},
+		{"core::0122::name-suffix", "AIP_0122_NAME_SUFFIX"},
+		{"client-libraries::4232::repeated-fields", "AIP_4232_REPEATED_FIELDS"},
 	}
 	for _, tt := range tests {
 		t.Run(string(tt.input), func(t *testing.T) {
