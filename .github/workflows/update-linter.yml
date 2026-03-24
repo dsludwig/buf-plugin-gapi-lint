@@ -68,6 +68,8 @@ jobs:
             --title "Update api-linter to ${LATEST_TAG}" \
             --body "Updates \`github.com/googleapis/api-linter/v2\` from \`${{ steps.current.outputs.version }}\` to \`${LATEST_TAG}\`.
 
-          Merging this PR will automatically create tag \`${RELEASE_TAG}\` and trigger a release build." \
+          Merging this PR will automatically create tag \`${RELEASE_TAG}\` and trigger a release build.
+
+          > **Note:** Close and reopen this PR to trigger CI (GITHUB_TOKEN events don't trigger workflows)." \
             --label "api-linter-update" \
             --head "$BRANCH"
