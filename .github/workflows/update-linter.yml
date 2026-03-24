@@ -40,8 +40,7 @@ jobs:
         run: |
           LATEST_TAG="${{ steps.latest.outputs.tag }}"
           LINTER_VERSION="${LATEST_TAG#v}"
-          PLUGIN_VERSION=$(cat VERSION | tr -d '[:space:]')
-          RELEASE_TAG="v${PLUGIN_VERSION}-${LINTER_VERSION}"
+          RELEASE_TAG="${LATEST_TAG}"
           BRANCH="update-api-linter-${LINTER_VERSION}"
 
           go get "github.com/googleapis/api-linter/v2@${LATEST_TAG}"
