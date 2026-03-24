@@ -22,9 +22,24 @@ jobs:
         with:
           go-version-file: go.mod
 
+      - name: Extract release notes
+        id: notes
+        run: |
+          TAG="${GITHUB_REF#refs/tags/}"
+          # Extract the section for this tag from CHANGELOG.md
+          # Skips the heading line, prints until the next "## " heading
+          awk -v tag="## ${TAG}" '
+            $0 == tag { found=1; next }
+            found && /^## / { exit }
+            found { print }
+          ' CHANGELOG.md > /tmp/release-notes.txt
+          if [ ! -s /tmp/release-notes.txt ]; then
+            echo "Release ${TAG}" > /tmp/release-notes.txt
+          fi
+
       - uses: goreleaser/goreleaser-action@v6
         with:
-          args: release --clean
+          args: release --clean --release-notes /tmp/release-notes.txt
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
