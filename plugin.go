@@ -34,6 +34,11 @@ func buildSpec() *check.Spec {
 	categories := make(map[string]string) // categoryID -> aipNumber
 	var ruleSpecs []*check.RuleSpec
 
+	groupCategories := map[string]string{
+		"core":             "AIP_CORE",
+		"client-libraries": "AIP_CLIENT_LIBRARIES",
+	}
+
 	for name := range registry {
 		bufID := ruleNameToBufPluginID(name)
 		idToRuleName[bufID] = name
@@ -44,12 +49,19 @@ func buildSpec() *check.Spec {
 			categories[catID] = parts[1]
 		}
 
+		// Every rule belongs to AIP (catch-all), its AIP number category,
+		// and its group category (AIP_CORE or AIP_CLIENT_LIBRARIES).
+		categoryIDs := []string{"AIP", catID}
+		if groupCat, ok := groupCategories[parts[0]]; ok {
+			categoryIDs = append(categoryIDs, groupCat)
+		}
+
 		isDefault := strings.HasPrefix(string(name), "core::")
 
 		ruleID := bufID // capture for closure
 		ruleSpecs = append(ruleSpecs, &check.RuleSpec{
 			ID:          ruleID,
-			CategoryIDs: []string{catID},
+			CategoryIDs: categoryIDs,
 			Default:     isDefault,
 			Purpose:     fmt.Sprintf("Enforces %s.", name),
 			Type:        check.RuleTypeLint,
@@ -60,7 +72,7 @@ func buildSpec() *check.Spec {
 				}
 				for _, p := range results.problems[ruleID] {
 					opts := []check.AddAnnotationOption{
-						check.WithMessage(p.problem.Message),
+						check.WithMessagef("%s (%s)", p.problem.Message, ruleNameToURL(p.problem.RuleID)),
 					}
 					if p.problem.Location != nil {
 						sourcePath := make(protoreflect.SourcePath, len(p.problem.Location.GetPath()))
@@ -84,7 +96,21 @@ func buildSpec() *check.Spec {
 	})
 
 	// Build category specs.
-	var categorySpecs []*check.CategorySpec
+	categorySpecs := []*check.CategorySpec{
+		{
+			ID:      "AIP",
+			Purpose: "Enables all AIP rules.",
+		},
+		{
+			ID:      "AIP_CORE",
+			Purpose: "Enables core AIP rules.",
+		},
+		{
+			ID:      "AIP_CLIENT_LIBRARIES",
+			Purpose: "Enables client library AIP rules.",
+		},
+	}
+
 	for catID, aipNumber := range categories {
 		categorySpecs = append(categorySpecs, &check.CategorySpec{
 			ID:      catID,
@@ -101,6 +127,9 @@ func buildSpec() *check.Spec {
 		Before: func(ctx context.Context, request check.Request) (context.Context, check.Request, error) {
 			protoFiles := make([]protoreflect.FileDescriptor, 0, len(request.FileDescriptors()))
 			for _, fd := range request.FileDescriptors() {
+				if fd.IsImport() {
+					continue
+				}
 				protoFiles = append(protoFiles, fd.ProtoreflectFileDescriptor())
 			}
 

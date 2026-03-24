@@ -20,12 +20,12 @@ func TestEnumUnspecified(t *testing.T) {
 				DirPaths:  []string{"testdata/enum_unspecified"},
 				FilePaths: []string{"test.proto"},
 			},
-			RuleIDs: []string{"CORE_0126_UNSPECIFIED"},
+			RuleIDs: []string{"AIP_0126_UNSPECIFIED"},
 		},
 		ExpectedAnnotations: []checktest.ExpectedAnnotation{
 			{
-				RuleID:  "CORE_0126_UNSPECIFIED",
-				Message: `The first enum value should be "STATE_UNSPECIFIED"`,
+				RuleID:  "AIP_0126_UNSPECIFIED",
+				Message: `The first enum value should be "STATE_UNSPECIFIED" (https://linter.aip.dev/126/unspecified)`,
 				FileLocation: &checktest.ExpectedFileLocation{
 					FileName:    "test.proto",
 					StartLine:   7,
@@ -47,12 +47,12 @@ func TestFieldLowerSnake(t *testing.T) {
 				DirPaths:  []string{"testdata/field_names"},
 				FilePaths: []string{"test.proto"},
 			},
-			RuleIDs: []string{"CORE_0140_LOWER_SNAKE"},
+			RuleIDs: []string{"AIP_0140_LOWER_SNAKE"},
 		},
 		ExpectedAnnotations: []checktest.ExpectedAnnotation{
 			{
-				RuleID:  "CORE_0140_LOWER_SNAKE",
-				Message: "Field `badName` must use lower_snake_case.",
+				RuleID:  "AIP_0140_LOWER_SNAKE",
+				Message: "Field `badName` must use lower_snake_case. (https://linter.aip.dev/140/lower-snake)",
 				FileLocation: &checktest.ExpectedFileLocation{
 					FileName:    "test.proto",
 					StartLine:   7,
@@ -67,8 +67,8 @@ func TestFieldLowerSnake(t *testing.T) {
 
 // TestDisableRule verifies that when specific RuleIDs are requested,
 // only those rules produce annotations. The enum_unspecified proto
-// triggers CORE_0126_UNSPECIFIED and several CORE_0191/0192 rules,
-// but requesting only CORE_0191_JAVA_PACKAGE should yield just that one.
+// triggers AIP_0126_UNSPECIFIED and several AIP_0191/0192 rules,
+// but requesting only AIP_0191_JAVA_PACKAGE should yield just that one.
 func TestDisableRule(t *testing.T) {
 	t.Parallel()
 	checktest.CheckTest{
@@ -78,12 +78,12 @@ func TestDisableRule(t *testing.T) {
 				DirPaths:  []string{"testdata/enum_unspecified"},
 				FilePaths: []string{"test.proto"},
 			},
-			RuleIDs: []string{"CORE_0191_JAVA_PACKAGE"},
+			RuleIDs: []string{"AIP_0191_JAVA_PACKAGE"},
 		},
 		ExpectedAnnotations: []checktest.ExpectedAnnotation{
 			{
-				RuleID:  "CORE_0191_JAVA_PACKAGE",
-				Message: "Proto files must set `option java_package`.",
+				RuleID:  "AIP_0191_JAVA_PACKAGE",
+				Message: "Proto files must set `option java_package`. (https://linter.aip.dev/191/java-package)",
 				FileLocation: &checktest.ExpectedFileLocation{
 					FileName:    "test.proto",
 					StartLine:   2,

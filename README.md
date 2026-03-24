@@ -36,12 +36,15 @@ version: v2
 lint:
   use:
     - STANDARD
-    # Enable specific api-linter rules or categories
-    - AIP_0203
-    - CORE_0140_LOWER_SNAKE
+    # Enable all AIP rules
+    - AIP
+    # Or enable specific categories/rules
+    # - AIP_CORE
+    # - AIP_0203
+    # - AIP_0140_LOWER_SNAKE
   except:
     # Disable specific rules
-    - CORE_0191_JAVA_PACKAGE
+    - AIP_0191_JAVA_PACKAGE
 plugins:
   - plugin: buf-plugin-gapi-lint
 ```
@@ -56,21 +59,28 @@ buf config ls-lint-rules
 
 ### Rule naming
 
-Each rule from the api-linter is exposed as a buf lint rule. The rule IDs are derived from the api-linter rule names by replacing `::` and `-` with `_` and uppercasing:
+Each rule from the api-linter is exposed as a buf lint rule. The group prefix (`core::`, `client-libraries::`) is dropped and all rules are prefixed with `AIP_`:
 
 | api-linter rule | buf rule ID |
 |---|---|
-| `core::0203::field-behavior-required` | `CORE_0203_FIELD_BEHAVIOR_REQUIRED` |
-| `core::0140::lower-snake` | `CORE_0140_LOWER_SNAKE` |
-| `core::0126::unspecified` | `CORE_0126_UNSPECIFIED` |
+| `core::0203::field-behavior-required` | `AIP_0203_FIELD_BEHAVIOR_REQUIRED` |
+| `core::0140::lower-snake` | `AIP_0140_LOWER_SNAKE` |
+| `client-libraries::4232::repeated-fields` | `AIP_4232_REPEATED_FIELDS` |
 
 ### Categories
 
-Rules are grouped into categories by AIP number. For example, `AIP_0203` includes all rules from [AIP-203](https://google.aip.dev/203).
+Rules are organized into several category levels:
+
+| Category | Description |
+|---|---|
+| `AIP` | All rules (catch-all) |
+| `AIP_CORE` | All `core::` rules |
+| `AIP_CLIENT_LIBRARIES` | All `client-libraries::` rules (AIP-4232) |
+| `AIP_0203`, `AIP_0140`, etc. | Rules for a specific AIP number |
 
 ### Defaults
 
-Rules in the `core::` group are enabled by default. Rules in other groups (e.g., `cloud::`) are disabled by default, matching the api-linter's own defaults.
+Rules in the `core::` group are enabled by default. `client-libraries::` rules are disabled by default, matching the api-linter's own defaults.
 
 ## Versioning
 
