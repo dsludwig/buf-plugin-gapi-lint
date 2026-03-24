@@ -19,9 +19,7 @@ jobs:
       - name: Compute release tag
         id: tag
         run: |
-          PLUGIN_VERSION=$(cat VERSION | tr -d '[:space:]')
-          LINTER_VERSION=$(grep 'github.com/googleapis/api-linter/v2' go.mod | awk '{print $2}' | sed 's/^v//')
-          TAG="v${PLUGIN_VERSION}-${LINTER_VERSION}"
+          TAG=$(grep 'github.com/googleapis/api-linter/v2' go.mod | awk '{print $2}')
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
 
       - name: Create and push tag

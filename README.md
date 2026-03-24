@@ -84,10 +84,7 @@ Rules in the `core::` group are enabled by default. `client-libraries::` rules a
 
 ## Versioning
 
-Releases follow the format `v{plugin}-{linter}`, e.g., `v1.0-2.3.1`:
-
-- `1.0` is the plugin version, bumped for changes to the plugin itself
-- `2.3.1` is the upstream api-linter version the build is based on
+Release versions mirror the upstream api-linter version. For example, `v2.3.1` of this plugin wraps api-linter `v2.3.1`.
 
 ## License
 
